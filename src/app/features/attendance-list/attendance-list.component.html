@@ -1,0 +1,163 @@
+<section class="page">
+  <div class="toolbar-row">
+    <h2>Attendance</h2>
+    <div class="btn-group">
+      <button mat-stroked-button (click)="checkIn()">
+        <mat-icon>login</mat-icon>
+        Check In
+      </button>
+      <button mat-flat-button color="primary" (click)="checkOut()">
+        <mat-icon>logout</mat-icon>
+        Check Out
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary strip -->
+  <div class="summary-strip">
+    <div class="summary-item">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ presentCount }} Present</span>
+    </div>
+    <div class="summary-item absent-item">
+      <mat-icon>cancel</mat-icon>
+      <span>{{ absentCount }} Absent</span>
+    </div>
+    @if (liveRecord) {
+    <div class="summary-item live-strip">
+      <span class="pulse-dot"></span>
+      <span>Checked in · {{ hoursLabel(liveRecord) }}</span>
+    </div>
+    }
+  </div>
+
+  <!-- Cards grid -->
+  <div class="att-grid">
+    @for (a of displayRows; track a.date) {
+
+    <!-- ABSENT card -->
+    @if (a.status === 'absent') {
+    <div class="att-card att-absent">
+      <div class="card-top">
+        <div class="card-date">
+          <span class="cd-day">{{ a.date | date: 'EEE' }}</span>
+          <span class="cd-num">{{ a.date | date: 'd MMM' }}</span>
+        </div>
+        <span class="chip chip-absent">Absent</span>
+      </div>
+      <div class="status-body">
+        <mat-icon class="status-icon absent-icon">person_off</mat-icon>
+        <span class="status-msg">No attendance recorded</span>
+      </div>
+      <div class="card-bar-track"></div>
+    </div>
+    }
+
+    <!-- YET TO CHECK IN card (today) -->
+    @else if (a.status === 'yet-to-checkin') {
+    <div class="att-card att-pending">
+      <div class="card-top">
+        <div class="card-date">
+          <span class="cd-day">{{ a.date | date: 'EEE' }}</span>
+          <span class="cd-num">{{ a.date | date: 'd MMM' }}</span>
+        </div>
+        <span class="chip chip-pending">Today</span>
+      </div>
+      <div class="status-body">
+        <mat-icon class="status-icon pending-icon">pending</mat-icon>
+        <span class="status-msg">Yet to check in</span>
+      </div>
+      <div class="card-bar-track"></div>
+    </div>
+    }
+
+    <!-- NORMAL / LIVE / INCOMPLETE card -->
+    @else {
+    <div class="att-card" [class.att-live]="a.status === 'live'">
+      <div class="card-top">
+        <div class="card-date">
+          <span class="cd-day">{{ a.date | date: 'EEE' }}</span>
+          <span class="cd-num">{{ a.date | date: 'd MMM' }}</span>
+        </div>
+        @if (a.status === 'live') {
+        <span class="chip chip-live">
+          <span class="pulse-dot sm"></span>
+          Live
+        </span>
+        } @else if (a.status === 'present') {
+        <span class="chip chip-done">Done</span>
+        } @else {
+        <span class="chip chip-warn">Incomplete</span>
+        }
+      </div>
+
+      <!-- Circular ring -->
+      <div class="card-ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="32" />
+          <circle
+            class="ring-fill"
+            cx="40"
+            cy="40"
+            r="32"
+            [class.ring-live]="a.status === 'live'"
+            [style.stroke-dashoffset]="ringOffset(a)"
+          />
+        </svg>
+        <div class="ring-label">
+          <strong>{{ hoursLabel(a) }}</strong>
+          <span>worked</span>
+        </div>
+      </div>
+
+      <!-- Times -->
+      <div class="times-row">
+        <div class="time-block">
+          <div class="time-dot in-dot"></div>
+          <div>
+            <span class="time-label">Check In</span>
+            <span class="time-val">{{ formatTime(a.checkInTime) }}</span>
+          </div>
+        </div>
+        <div class="times-sep"></div>
+        <div class="time-block">
+          <div
+            class="time-dot"
+            [class.out-dot]="a.checkOutTime"
+            [class.out-empty]="!a.checkOutTime"
+          ></div>
+          <div>
+            <span class="time-label">Check Out</span>
+            <span class="time-val" [class.muted]="!a.checkOutTime">
+              {{ formatTime(a.checkOutTime) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-bar-track">
+        <div
+          class="card-bar-fill"
+          [class.card-bar-live]="a.status === 'live'"
+          [style.width.%]="barWidth(a)"
+        ></div>
+      </div>
+    </div>
+    } }
+  </div>
+
+  @if (!rows.length) {
+  <div class="empty-state">
+    <mat-icon>event_busy</mat-icon>
+    <p>No attendance records found.</p>
+  </div>
+  } @if (rows.length) {
+  <mat-paginator
+    [length]="rows.length"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPage($event)"
+  ></mat-paginator>
+  }
+</section>

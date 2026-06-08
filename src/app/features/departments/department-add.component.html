@@ -1,0 +1,8 @@
+<section class="page">
+  <div class="toolbar-row"><h2>Add Department</h2></div>
+  <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+    <mat-form-field appearance="outline"><mat-label>Name</mat-label><input matInput formControlName="name"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Description</mat-label><input matInput formControlName="description"></mat-form-field>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+  </form>
+</section>

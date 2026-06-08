@@ -1,0 +1,39 @@
+.employee-card {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+.profile-card {
+	display: flex;
+	gap: 16px;
+	padding: 16px;
+	align-items: center;
+	min-width: 320px;
+}
+
+.avatar {
+	width: 96px;
+	height: 96px;
+	border-radius: 50%;
+	background: #1976d2;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 28px;
+	font-weight: 600;
+}
+
+.info h3 { margin: 0 0 4px 0; }
+.muted { color: #666; margin: 0 0 8px 0; }
+
+.attendance-panel {
+	flex: 1;
+}
+
+@media (max-width: 800px) {
+	.employee-card { flex-direction: column; }
+	.profile-card { width: 100%; }
+}
+

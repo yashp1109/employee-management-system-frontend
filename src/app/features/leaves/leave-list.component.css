@@ -1,0 +1,88 @@
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+/* Balance cards */
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.balance-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  transition: box-shadow .15s;
+}
+.balance-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.09); }
+
+.balance-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.leave-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+.remaining {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e40af;
+  line-height: 1;
+}
+
+.balance-bar-wrap {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.balance-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #1e40af);
+  border-radius: 999px;
+  transition: width .4s ease;
+  min-width: 4px;
+}
+
+.balance-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.balance-meta strong { color: #475569; }
+
+.no-balance {
+  color: #94a3b8;
+  font-size: 14px;
+  padding: 8px 0 20px;
+}
+
+/* History table empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 24px;
+  color: #94a3b8;
+}
+.empty-state mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  display: block;
+  margin: 0 auto 10px;
+}
+.empty-state p { margin: 0; font-size: 14px; }

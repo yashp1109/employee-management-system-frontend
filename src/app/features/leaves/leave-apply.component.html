@@ -1,0 +1,96 @@
+<section class="page">
+  <div class="toolbar-row">
+    <h2>Apply Leave</h2>
+    <button mat-stroked-button routerLink="/leaves">Back</button>
+  </div>
+
+  <div class="apply-layout">
+
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Leave Type</mat-label>
+          <mat-select formControlName="leaveTypeId">
+            @for (b of balances; track b.leaveTypeId) {
+              <mat-option [value]="b.leaveTypeId">{{ b.leaveTypeName }}</mat-option>
+            }
+            @if (!balances.length) {
+              <mat-option disabled>Loading...</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Balance info card — only shown when balance data is available -->
+        @if (selectedBalance && balanceKnown) {
+          <div class="balance-info" [class.low]="selectedBalance.remainingDays <= 2" [class.exhausted]="selectedBalance.remainingDays === 0">
+            <div class="balance-info-row">
+              <div class="bi-item">
+                <span>Available</span>
+                <strong class="avail">{{ selectedBalance.remainingDays }}</strong>
+              </div>
+              <div class="bi-divider"></div>
+              <div class="bi-item">
+                <span>Used</span>
+                <strong>{{ selectedBalance.usedDays }}</strong>
+              </div>
+              <div class="bi-divider"></div>
+              <div class="bi-item">
+                <span>Total</span>
+                <strong>{{ selectedBalance.totalDays }}</strong>
+              </div>
+            </div>
+            <div class="balance-bar-wrap">
+              <div class="balance-bar"
+                [style.width.%]="selectedBalance.totalDays > 0 ? (selectedBalance.remainingDays / selectedBalance.totalDays) * 100 : 0"
+                [class.bar-low]="selectedBalance.remainingDays <= 2"
+                [class.bar-empty]="selectedBalance.remainingDays === 0">
+              </div>
+            </div>
+            @if (selectedBalance.remainingDays === 0) {
+              <div class="no-leave-banner">
+                <mat-icon>block</mat-icon>
+                <div>
+                  <strong>No {{ selectedBalance.leaveTypeName }} remaining</strong>
+                  <p>You have used all {{ selectedBalance.totalDays }} days of your {{ selectedBalance.leaveTypeName }} quota. Please select a different leave type.</p>
+                </div>
+              </div>
+            } @else if (selectedBalance.remainingDays <= 2) {
+              <p class="warn-text"><mat-icon>info</mat-icon> Only {{ selectedBalance.remainingDays }} day(s) left for {{ selectedBalance.leaveTypeName }}.</p>
+            }
+          </div>
+        }
+
+        <!-- Hide rest of form if no leave left -->
+        @if (!noLeaveLeft) {
+          <div class="date-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput type="date" formControlName="startDate">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>End Date</mat-label>
+              <input matInput type="date" formControlName="endDate">
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Reason</mat-label>
+            <input matInput formControlName="reason" placeholder="Brief reason for leave">
+          </mat-form-field>
+        }
+
+        <div class="form-actions">
+          @if (!noLeaveLeft) {
+            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+              Submit Application
+            </button>
+          }
+          <button mat-stroked-button type="button" routerLink="/leaves">Cancel</button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</section>

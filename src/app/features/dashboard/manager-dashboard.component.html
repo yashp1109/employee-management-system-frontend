@@ -1,0 +1,39 @@
+<section class="page">
+  <div class="toolbar-row">
+    <h2>Manager Dashboard</h2>
+    <span class="welcome">Welcome back 👋</span>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon"><mat-icon>group</mat-icon></div>
+      <div class="stat-body">
+        <span>Team Members</span>
+        <strong>{{ data?.teamMembers || 0 }}</strong>
+      </div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon"><mat-icon>pending_actions</mat-icon></div>
+      <div class="stat-body">
+        <span>Pending Approvals</span>
+        <strong>{{ data?.pendingApprovals || 0 }}</strong>
+      </div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon"><mat-icon>event_available</mat-icon></div>
+      <div class="stat-body">
+        <span>Approved This Month</span>
+        <strong>{{ data?.approvedThisMonth || 0 }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-links">
+    <a class="quick-link" routerLink="/leaves/approvals">
+      <mat-icon>fact_check</mat-icon><span>Leave Approvals</span>
+    </a>
+    <a class="quick-link" routerLink="/attendance">
+      <mat-icon>schedule</mat-icon><span>Attendance</span>
+    </a>
+  </div>
+</section>

@@ -1,0 +1,97 @@
+.welcome { font-size: 14px; color: #64748b; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  transition: box-shadow .15s, transform .15s;
+}
+.stat-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,.09); transform: translateY(-2px); }
+
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.stat-icon mat-icon { font-size: 24px; width: 24px; height: 24px; }
+
+.stat-card.blue  .stat-icon { background: #eff6ff; color: #1d4ed8; }
+.stat-card.green .stat-icon { background: #f0fdf4; color: #15803d; }
+.stat-card.purple .stat-icon { background: #f5f3ff; color: #6d28d9; }
+.stat-card.amber .stat-icon { background: #fffbeb; color: #b45309; }
+.stat-card.teal  .stat-icon { background: #f0fdfa; color: #0f766e; }
+.stat-card.rose  .stat-icon { background: #fff1f2; color: #be123c; }
+
+.stat-body span {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+.stat-body strong {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a2332;
+  line-height: 1;
+}
+
+/* Quick links */
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #334155;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.quick-link mat-icon { font-size: 20px; width: 20px; height: 20px; color: #3b82f6; }
+.quick-link:hover { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+
+/* Leave balance cards for employee dashboard */
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.balance-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.balance-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.balance-top span { font-size: 13px; font-weight: 600; color: #334155; }
+.balance-top strong { font-size: 28px; font-weight: 700; color: #1e40af; line-height: 1; }
+.balance-bar-wrap { height: 5px; background: #e2e8f0; border-radius: 999px; margin-bottom: 8px; overflow: hidden; }
+.balance-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 999px; }
+.balance-meta { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }

@@ -1,0 +1,65 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav mode="side" opened>
+    <div class="brand">
+      <div class="brand-icon">E</div>
+      <span>EMS</span>
+    </div>
+
+    <div class="nav-section">Main</div>
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+      <mat-icon>dashboard</mat-icon>Dashboard
+    </a>
+
+    @if (canManagePeople()) {
+      <div class="nav-section">Management</div>
+      <a class="nav-link" routerLink="/employees" routerLinkActive="active">
+        <mat-icon>groups</mat-icon>Employees
+      </a>
+      <a class="nav-link" routerLink="/departments" routerLinkActive="active">
+        <mat-icon>apartment</mat-icon>Departments
+      </a>
+    }
+
+    <div class="nav-section">My Space</div>
+    <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+      <mat-icon>account_circle</mat-icon>My Profile
+    </a>
+    <a class="nav-link" routerLink="/attendance" routerLinkActive="active">
+      <mat-icon>schedule</mat-icon>Attendance
+    </a>
+    <a class="nav-link" routerLink="/leaves" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+      <mat-icon>event_available</mat-icon>My Leaves
+    </a>
+    @if (canApproveLeaves()) {
+      <a class="nav-link" routerLink="/leaves/approvals" routerLinkActive="active">
+        <mat-icon>fact_check</mat-icon>Leave Approvals
+      </a>
+    }
+
+    <div class="sidenav-footer">
+      <div class="user-row">
+        <div class="avatar">{{ user()?.fullName?.[0] | uppercase }}</div>
+        <div class="user-info">
+          <strong>{{ user()?.fullName }}</strong>
+          <span>{{ user()?.role }}</span>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="auth.logout()">
+        <mat-icon>logout</mat-icon>Sign out
+      </button>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar>
+      <span class="page-title">Employee Management System</span>
+      <span class="spacer"></span>
+      <div class="toolbar-avatar">{{ user()?.fullName?.[0] | uppercase }}</div>
+      <div class="toolbar-user">
+        <strong>{{ user()?.fullName }}</strong>
+        <span>{{ user()?.role }}</span>
+      </div>
+    </mat-toolbar>
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

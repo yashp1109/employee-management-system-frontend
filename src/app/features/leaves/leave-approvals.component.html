@@ -1,0 +1,22 @@
+<section class="page">
+  <div class="toolbar-row"><h2>Leave Approvals</h2></div>
+  <div class="table-wrap">
+    <table mat-table [dataSource]="rows">
+      <ng-container matColumnDef="employee"><th mat-header-cell *matHeaderCellDef>Employee</th><td mat-cell *matCellDef="let l">{{ l.employeeName }}</td></ng-container>
+      <ng-container matColumnDef="type"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let l">{{ l.leaveTypeName }}</td></ng-container>
+      <ng-container matColumnDef="dates"><th mat-header-cell *matHeaderCellDef>Dates</th><td mat-cell *matCellDef="let l">{{ l.startDate }} – {{ l.endDate }}</td></ng-container>
+      <ng-container matColumnDef="days"><th mat-header-cell *matHeaderCellDef>Days</th><td mat-cell *matCellDef="let l">{{ l.days }}</td></ng-container>
+      <ng-container matColumnDef="reason"><th mat-header-cell *matHeaderCellDef>Reason</th><td mat-cell *matCellDef="let l">{{ l.reason }}</td></ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let l">
+          <button mat-icon-button color="primary" title="Approve" (click)="approve(l.id!)"><mat-icon>check_circle</mat-icon></button>
+          <button mat-icon-button color="warn" title="Reject" (click)="reject(l.id!)"><mat-icon>cancel</mat-icon></button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+    @if (!rows.length) { <p class="empty">No pending approvals.</p> }
+  </div>
+</section>

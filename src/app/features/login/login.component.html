@@ -1,0 +1,90 @@
+<main class="login">
+  <div class="login-shell">
+    <aside class="brand-panel">
+      <div class="brand-panel__top">
+        <div class="brand-mark">EMS</div>
+        <div>
+          <p class="brand-label">Employee Management System</p>
+          <h1>Corporate HR Portal</h1>
+        </div>
+      </div>
+
+      <p class="brand-copy">
+        A secure enterprise platform for attendance, leave management, and
+        employee approval workflows.
+      </p>
+
+      <div class="brand-features">
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          Centralized employee access control
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          Request-driven profile updates
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          Audit-ready attendance reporting
+        </div>
+      </div>
+
+      <div class="brand-footer">
+        Built for modern HR, finance and operations teams.
+      </div>
+    </aside>
+
+    <section class="form-panel">
+      <div class="form-content">
+        <div class="form-intro">
+          <p class="eyebrow">Welcome back</p>
+          <h2>Sign in to your workspace</h2>
+          <p>
+            Enter your credentials to access employee dashboards and approval
+            workflows.
+          </p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix>mail</mat-icon>
+            <mat-label>Email address</mat-label>
+            <input
+              matInput
+              formControlName="email"
+              type="email"
+              autocomplete="email"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix>lock</mat-icon>
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              formControlName="password"
+              type="password"
+              autocomplete="current-password"
+            />
+          </mat-form-field>
+
+          @if (error) {
+          <div class="error">{{ error }}</div>
+          }
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid"
+            class="login-btn"
+          >
+            Sign in securely
+          </button>
+
+          <p class="hint">Demo: admin&#64;ems.local / Password&#64;123</p>
+        </form>
+      </div>
+    </section>
+  </div>
+</main>

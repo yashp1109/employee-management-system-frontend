@@ -1,0 +1,46 @@
+<section class="page">
+  <div class="toolbar-row">
+    <h2>My Dashboard</h2>
+    <span class="welcome">Welcome back 👋</span>
+  </div>
+
+  <div class="section-label">Leave Balance</div>
+  <div class="balance-grid">
+    @for (b of data?.leaveBalance || []; track b.leaveTypeId) {
+      <div class="balance-card">
+        <div class="balance-top">
+          <span>{{ b.leaveTypeName }}</span>
+          <strong>{{ b.remainingDays }}</strong>
+        </div>
+        <div class="balance-bar-wrap">
+          <div class="balance-bar"
+            [style.width.%]="b.totalDays > 0 ? (b.remainingDays / b.totalDays) * 100 : 0">
+          </div>
+        </div>
+        <div class="balance-meta">
+          <span>Used: {{ b.usedDays }}</span>
+          <span>Total: {{ b.totalDays }}</span>
+        </div>
+      </div>
+    }
+    @if (!data?.leaveBalance?.length) {
+      <p class="no-data">No leave balance data available.</p>
+    }
+  </div>
+
+  <div class="section-label" style="margin-top: 24px;">Quick Actions</div>
+  <div class="quick-links">
+    <a class="quick-link" routerLink="/leaves/apply">
+      <mat-icon>add_circle</mat-icon><span>Apply Leave</span>
+    </a>
+    <a class="quick-link" routerLink="/attendance">
+      <mat-icon>schedule</mat-icon><span>My Attendance</span>
+    </a>
+    <a class="quick-link" routerLink="/leaves">
+      <mat-icon>event_available</mat-icon><span>Leave History</span>
+    </a>
+    <a class="quick-link" routerLink="/profile">
+      <mat-icon>account_circle</mat-icon><span>My Profile</span>
+    </a>
+  </div>
+</section>

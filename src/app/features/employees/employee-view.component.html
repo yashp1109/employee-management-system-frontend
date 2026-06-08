@@ -1,0 +1,65 @@
+<section class="page">
+  <div class="toolbar-row">
+    <h2>Employee</h2>
+    <div>
+      @if (canEdit && employee) {
+      <button
+        mat-flat-button
+        color="primary"
+        [routerLink]="['../', employee.id, 'edit']"
+      >
+        Edit
+      </button>
+      }
+      <button mat-stroked-button routerLink="../">Back</button>
+    </div>
+  </div>
+
+  @if (employee) {
+  <div class="employee-card">
+    <mat-card class="profile-card">
+      <div class="avatar">
+        {{ (employee.firstName[0] || '') + (employee.lastName[0] || '') }}
+      </div>
+      <div class="info">
+        <h3>{{ employee | employeeName }}</h3>
+        <p class="muted">{{ employee.role }} • {{ employee.status }}</p>
+        <p>
+          <strong>Email:</strong>
+          {{ employee.email }}
+        </p>
+        <p>
+          <strong>Department:</strong>
+          {{ employee.departmentName }}
+        </p>
+        <p>
+          <strong>Designation:</strong>
+          {{ employee.designationName }}
+        </p>
+        @if (employee.mobileNumber) {
+        <p>
+          <strong>Mobile:</strong>
+          {{ employee.mobileNumber }}
+        </p>
+        } @if (!auth.canEditEmployee(employee.id) &&
+        auth.canRequestProfileUpdate(employee.id)) {
+        <p>
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="requestProfileUpdate()"
+          >
+            Request Profile Update
+          </button>
+        </p>
+        }
+      </div>
+    </mat-card>
+
+    <div class="attendance-panel">
+      <h3>Attendance (recent)</h3>
+      <attendance-list [employeeId]="employee.id"></attendance-list>
+    </div>
+  </div>
+  }
+</section>

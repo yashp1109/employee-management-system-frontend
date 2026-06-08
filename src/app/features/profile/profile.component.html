@@ -1,0 +1,43 @@
+<section class="page">
+  <div class="toolbar-row">
+    <h2>My Profile</h2>
+    @if (canEdit && profile) {
+      <button mat-stroked-button [routerLink]="['/employees', profile.id, 'edit']">Edit</button>
+    }
+  </div>
+
+  @if (profile) {
+    <div class="stat-grid">
+      <div class="stat"><span>Name</span><strong>{{ profile.firstName }} {{ profile.lastName }}</strong></div>
+      <div class="stat"><span>Email</span><strong>{{ profile.email }}</strong></div>
+      <div class="stat"><span>Department</span><strong>{{ profile.departmentName }}</strong></div>
+      <div class="stat"><span>Designation</span><strong>{{ profile.designationName }}</strong></div>
+      <div class="stat"><span>Role</span><strong>{{ profile.role }}</strong></div>
+      <div class="stat"><span>Status</span><strong>{{ profile.status }}</strong></div>
+    </div>
+  }
+
+  <div class="section-title">Leave Summary</div>
+  <div class="leave-grid">
+    <div class="leave-card total">
+      <span class="count">{{ leaveStats.total }}</span>
+      <span class="label">Total Applied</span>
+    </div>
+    <div class="leave-card approved">
+      <span class="count">{{ leaveStats.approved }}</span>
+      <span class="label">Approved</span>
+    </div>
+    <div class="leave-card pending">
+      <span class="count">{{ leaveStats.pending }}</span>
+      <span class="label">Pending</span>
+    </div>
+    <div class="leave-card rejected">
+      <span class="count">{{ leaveStats.rejected }}</span>
+      <span class="label">Rejected</span>
+    </div>
+    <div class="leave-card cancelled">
+      <span class="count">{{ leaveStats.cancelled }}</span>
+      <span class="label">Cancelled</span>
+    </div>
+  </div>
+</section>

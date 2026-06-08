@@ -1,0 +1,144 @@
+.apply-layout {
+  max-width: 560px;
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+
+.full-width { width: 100%; }
+
+/* Balance info card */
+.balance-info {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+.balance-info.low {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.balance-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 12px;
+}
+.bi-item {
+  flex: 1;
+  text-align: center;
+}
+.bi-item span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+.bi-item strong {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a2332;
+}
+.bi-item strong.avail { color: #0369a1; }
+.balance-info.low .bi-item strong.avail { color: #c2410c; }
+
+.bi-divider {
+  width: 1px;
+  height: 36px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.balance-bar-wrap {
+  height: 6px;
+  background: #e0f2fe;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.balance-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #0284c7);
+  border-radius: 999px;
+  transition: width .4s ease;
+  min-width: 3px;
+}
+.balance-bar.bar-low {
+  background: linear-gradient(90deg, #fb923c, #ea580c);
+}
+
+.balance-info.exhausted {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.balance-info.exhausted .bi-item strong.avail { color: #b91c1c; }
+
+.balance-bar.bar-empty {
+  display: none;
+}
+
+.no-leave-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 4px;
+}
+.no-leave-banner mat-icon {
+  color: #b91c1c;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.no-leave-banner strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b91c1c;
+  margin-bottom: 4px;
+}
+.no-leave-banner p {
+  margin: 0;
+  font-size: 12px;
+  color: #7f1d1d;
+  line-height: 1.5;
+}
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #c2410c;
+}
+.warn-text mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+/* Date row */
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.date-row mat-form-field { width: 100%; }
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}

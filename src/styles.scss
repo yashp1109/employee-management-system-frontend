@@ -1,0 +1,150 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$green-palette
+  ),
+  typography: (
+    brand-family: 'Inter',
+    plain-family: 'Inter'
+  ),
+  density: (
+    scale: -1
+  )
+));
+
+html { @include mat.all-component-themes($theme); }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, Arial, sans-serif;
+  background: #f0f4f9;
+  color: #1a2332;
+}
+
+/* ── Page shell ── */
+.page {
+  padding: 28px 32px;
+  max-width: 1200px;
+}
+
+/* ── Page header row ── */
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+.toolbar-row h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a2332;
+  letter-spacing: -0.3px;
+}
+
+/* ── Cards / stat grid ── */
+.stat-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-bottom: 28px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  transition: box-shadow .15s;
+}
+.stat:hover { box-shadow: 0 4px 12px rgba(0,0,0,.09); }
+.stat span {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.stat strong {
+  display: block;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1e40af;
+  line-height: 1;
+}
+
+/* ── Tables ── */
+.table-wrap {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.mat-mdc-header-row { background: #f8fafc; }
+.mat-mdc-header-cell {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #64748b;
+}
+.mat-mdc-row:hover { background: #f1f5fd; }
+.mat-mdc-cell { font-size: 14px; color: #334155; }
+
+/* ── Status badge ── */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+.badge-active   { background: #dcfce7; color: #15803d; }
+.badge-inactive { background: #fef9c3; color: #854d0e; }
+.badge-terminated { background: #fee2e2; color: #b91c1c; }
+.badge-approved { background: #dcfce7; color: #15803d; }
+.badge-pending  { background: #fef9c3; color: #854d0e; }
+.badge-rejected { background: #fee2e2; color: #b91c1c; }
+.badge-cancelled{ background: #f1f5f9; color: #64748b; }
+
+/* ── Forms ── */
+.form-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.form-grid {
+  display: grid;
+  gap: 4px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #94a3b8;
+}
+.empty-state mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 12px; }
+.empty-state p { margin: 0; font-size: 15px; }

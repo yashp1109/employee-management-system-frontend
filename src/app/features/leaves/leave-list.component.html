@@ -1,0 +1,92 @@
+<section class="page">
+
+  <div class="toolbar-row">
+    <h2>My Leaves</h2>
+    <button mat-flat-button color="primary" routerLink="apply">
+      <mat-icon>add</mat-icon>Apply Leave
+    </button>
+  </div>
+
+  <!-- Leave Balance Cards -->
+  <div class="section-label">Available Leave Balance</div>
+  @if (balances.length) {
+    <div class="balance-grid">
+      @for (b of balances; track b.leaveTypeId) {
+        <div class="balance-card">
+          <div class="balance-top">
+            <span class="leave-name">{{ b.leaveTypeName }}</span>
+            <span class="remaining">{{ b.remainingDays }}</span>
+          </div>
+          <div class="balance-bar-wrap">
+            <div class="balance-bar"
+              [style.width.%]="b.totalDays > 0 ? (b.remainingDays / b.totalDays) * 100 : 0">
+            </div>
+          </div>
+          <div class="balance-meta">
+            <span>Used: <strong>{{ b.usedDays }}</strong></span>
+            <span>Total: <strong>{{ b.totalDays }}</strong></span>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="no-balance">No leave balance data available.</div>
+  }
+
+  <!-- Leave History Table -->
+  <div class="section-label" style="margin-top: 28px;">Leave History</div>
+  <div class="table-wrap">
+    <table mat-table [dataSource]="rows">
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Leave Type</th>
+        <td mat-cell *matCellDef="let l">{{ l.leaveTypeName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="dates">
+        <th mat-header-cell *matHeaderCellDef>Dates</th>
+        <td mat-cell *matCellDef="let l">{{ l.startDate }} → {{ l.endDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="days">
+        <th mat-header-cell *matHeaderCellDef>Days</th>
+        <td mat-cell *matCellDef="let l">{{ l.days }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let l">
+          <span class="badge"
+            [class.badge-approved]="l.status === 'APPROVED'"
+            [class.badge-pending]="l.status === 'PENDING'"
+            [class.badge-rejected]="l.status === 'REJECTED'"
+            [class.badge-cancelled]="l.status === 'CANCELLED'">
+            {{ l.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let l">
+          @if (l.status === 'PENDING') {
+            <button mat-icon-button color="warn" title="Cancel" (click)="cancel(l.id!)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+
+    @if (!rows.length) {
+      <div class="empty-state">
+        <mat-icon>event_busy</mat-icon>
+        <p>No leave history found.</p>
+      </div>
+    }
+  </div>
+
+</section>

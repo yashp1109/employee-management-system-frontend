@@ -1,0 +1,69 @@
+<section class="page">
+  <div class="toolbar-row">
+    <h2>{{ id ? 'Edit' : 'Add' }} Employee</h2>
+    <button mat-stroked-button type="button" routerLink="/employees">Cancel</button>
+  </div>
+  <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+
+    @for (field of textFields; track field.name) {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ field.label }}</mat-label>
+        <input matInput [type]="field.type" [formControlName]="field.name" />
+      </mat-form-field>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Gender</mat-label>
+      <mat-select formControlName="gender">
+        <mat-option value="MALE">Male</mat-option>
+        <mat-option value="FEMALE">Female</mat-option>
+        <mat-option value="OTHER">Other</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Department</mat-label>
+      <mat-select formControlName="departmentId">
+        @for (dept of departmentList; track dept.id) {
+          <mat-option [value]="dept.id">{{ dept.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Designation</mat-label>
+      <mat-select formControlName="designationId">
+        @if (!form.value.departmentId) {
+          <mat-option disabled>Select a department first</mat-option>
+        }
+        @for (desig of designationList; track desig.id) {
+          <mat-option [value]="desig.id">{{ desig.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Role</mat-label>
+      <mat-select formControlName="role">
+        <mat-option value="ADMIN">Admin</mat-option>
+        <mat-option value="HR">HR</mat-option>
+        <mat-option value="MANAGER">Manager</mat-option>
+        <mat-option value="EMPLOYEE">Employee</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="ACTIVE">Active</mat-option>
+        <mat-option value="INACTIVE">Inactive</mat-option>
+        <mat-option value="TERMINATED">Terminated</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="form-actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+    </div>
+
+  </form>
+</section>
