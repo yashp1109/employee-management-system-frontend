@@ -39,7 +39,7 @@ export interface Employee {
   dateOfJoining: string;
   departmentId: number;
   departmentName?: string;
-  designationId: number;
+  designationId?: number | null;
   designationName?: string;
   salary: number;
   managerId?: number;

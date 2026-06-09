@@ -181,7 +181,7 @@ export class EmployeeListComponent implements OnInit {
       dateOfBirth: src?.dateOfBirth,
       dateOfJoining: v.dateOfJoining!,
       departmentId: v.departmentId!,
-      designationId: src?.designationId ?? (null as unknown as number),
+      designationId: src?.designationId ?? null,
       salary: src?.salary ?? 0,
       managerId: v.managerId ?? undefined,
       status: src?.status ?? "ACTIVE",
