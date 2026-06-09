@@ -1,60 +1,195 @@
-<section class="page">
-  <div class="toolbar-row">
-    <h2>Employees</h2>
-    <button mat-flat-button color="primary" routerLink="add">
-      <mat-icon>person_add</mat-icon>
-      Add Employee
-    </button>
+<section class="emp-page">
+  <div class="emp-card">
+    <!-- Header -->
+    <div class="emp-card-header">
+      <h2>Employees List</h2>
+      <button type="button" class="btn-primary-emp" (click)="openAdd()">
+        + Add Employee
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row" [formGroup]="filters">
+      <input
+        type="text"
+        class="filter-control search-input"
+        placeholder="Search by Name"
+        formControlName="q"
+      />
+      <select class="filter-control" formControlName="departmentId">
+        <option [ngValue]="null">All Departments</option>
+        @for (dept of departmentList; track dept.id) {
+          <option [ngValue]="dept.id">{{ dept.name }}</option>
+        }
+      </select>
+      <select class="filter-control" formControlName="managerId">
+        <option [ngValue]="null">All Managers</option>
+        @for (mgr of managerList; track mgr.id) {
+          <option [ngValue]="mgr.id">{{ mgr.name }}</option>
+        }
+      </select>
+      <div class="date-range">
+        <span class="date-range-label">Joining Date</span>
+        <input type="date" class="filter-control date-input" formControlName="joiningFrom" />
+        <span class="date-sep">–</span>
+        <input type="date" class="filter-control date-input" formControlName="joiningTo" />
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-scroll">
+      <table class="emp-table">
+        <thead>
+          <tr>
+            <th>Employee Name</th>
+            <th>Employee Code</th>
+            <th>Department</th>
+            <th>Manager</th>
+            <th>Joined Date</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of rows; track e.id) {
+            <tr>
+              <td class="emp-name">{{ e.firstName }} {{ e.lastName }}</td>
+              <td>{{ e.employeeCode }}</td>
+              <td>{{ e.departmentName || "—" }}</td>
+              <td>{{ e.managerName || "—" }}</td>
+              <td>{{ e.dateOfJoining | date: "MM/dd/yyyy" }}</td>
+              <td class="actions-col">
+                <button type="button" class="btn-edit" (click)="openEdit(e)">
+                  <span class="material-icons">edit</span> Edit
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete"
+                  aria-label="Delete"
+                  (click)="askDelete(e)"
+                >
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-row">No employees found</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-row">
+      <button
+        type="button"
+        class="page-btn"
+        [disabled]="pageIndex === 0"
+        (click)="prevPage()"
+      >
+        Previous
+      </button>
+      <span class="page-indicator">{{ pageIndex + 1 }} of {{ totalPages }}</span>
+      <button
+        type="button"
+        class="page-btn"
+        [disabled]="pageIndex + 1 >= totalPages"
+        (click)="nextPage()"
+      >
+        Next
+      </button>
+    </div>
   </div>
-  <mat-form-field appearance="outline">
-    <mat-label>Search employees</mat-label>
-    <input matInput [(ngModel)]="q" (ngModelChange)="load()" />
-  </mat-form-field>
-  <div class="table-wrap">
-    <table mat-table [dataSource]="rows">
-      <ng-container matColumnDef="code">
-        <th mat-header-cell *matHeaderCellDef>Code</th>
-        <td mat-cell *matCellDef="let e">{{ e.employeeCode }}</td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let e">{{ e.firstName }} {{ e.lastName }}</td>
-      </ng-container>
-      <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>Email</th>
-        <td mat-cell *matCellDef="let e">{{ e.email }}</td>
-      </ng-container>
-      <ng-container matColumnDef="department">
-        <th mat-header-cell *matHeaderCellDef>Department</th>
-        <td mat-cell *matCellDef="let e">{{ e.departmentName }}</td>
-      </ng-container>
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td mat-cell *matCellDef="let e">{{ e.status }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let e">
-          <button mat-icon-button [routerLink]="[e.id]" aria-label="View">
-            <mat-icon>visibility</mat-icon>
+
+  <!-- Slide-over panel: Add / Edit Employee -->
+  @if (panelOpen) {
+    <div class="drawer-overlay" (click)="closePanel()"></div>
+    <aside class="drawer" [class.open]="panelOpen">
+      <div class="drawer-header">
+        <h3>{{ editingId ? "Edit Employee" : "Add Employee" }}</h3>
+        <button type="button" class="drawer-close" aria-label="Close" (click)="closePanel()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <form class="drawer-body" [formGroup]="form" (ngSubmit)="save()">
+        <label class="field">
+          <span class="field-label">Full Name</span>
+          <input type="text" class="field-control" formControlName="fullName" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Employee Code</span>
+          <input type="text" class="field-control" formControlName="employeeCode" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Department</span>
+          <select class="field-control" formControlName="departmentId">
+            <option [ngValue]="null" disabled>Select Department</option>
+            @for (dept of departmentList; track dept.id) {
+              <option [ngValue]="dept.id">{{ dept.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Manager</span>
+          <select class="field-control" formControlName="managerId">
+            <option [ngValue]="null">Select Manager</option>
+            @for (mgr of managerList; track mgr.id) {
+              <option [ngValue]="mgr.id">{{ mgr.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Joining Date</span>
+          <input type="date" class="field-control" formControlName="dateOfJoining" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Email Address</span>
+          <input type="email" class="field-control" formControlName="email" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Phone Number</span>
+          <input type="text" class="field-control" formControlName="mobileNumber" />
+        </label>
+
+        <div class="drawer-actions">
+          <button type="button" class="btn-cancel" (click)="closePanel()">Cancel</button>
+          <button type="submit" class="btn-primary-emp" [disabled]="saving">
+            {{ saving ? "Saving..." : "Save Employee" }}
           </button>
-          <button
-            mat-icon-button
-            *ngIf="auth.canEditEmployee(e.id)"
-            [routerLink]="[e.id, 'edit']"
-            aria-label="Edit"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="columns"></tr>
-      <tr mat-row *matRowDef="let row; columns: columns"></tr>
-    </table>
-    <mat-paginator
-      [length]="total"
-      [pageSize]="10"
-      (page)="page($event)"
-    ></mat-paginator>
-  </div>
+        </div>
+      </form>
+    </aside>
+  }
+
+  <!-- Delete confirmation -->
+  @if (deleteTarget) {
+    <div class="modal-overlay" (click)="cancelDelete()"></div>
+    <div class="confirm-modal" role="dialog" aria-modal="true">
+      <h4>Delete employee?</h4>
+      <p>
+        This will permanently remove
+        <strong>{{ deleteTarget.firstName }} {{ deleteTarget.lastName }}</strong
+        >.
+      </p>
+      <div class="confirm-actions">
+        <button type="button" class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button
+          type="button"
+          class="btn-danger"
+          [disabled]="deleting"
+          (click)="confirmDelete()"
+        >
+          {{ deleting ? "Deleting..." : "Delete" }}
+        </button>
+      </div>
+    </div>
+  }
 </section>

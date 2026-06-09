@@ -1,11 +1,21 @@
 export type Role = "ADMIN" | "HR" | "MANAGER" | "EMPLOYEE";
 export type Status = "ACTIVE" | "INACTIVE" | "TERMINATED";
 
-export interface Page<T> {
-  content: T[];
-  totalElements: number;
+export interface PageMeta {
   size: number;
   number: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface Page<T> {
+  content: T[];
+  page: PageMeta;
+}
+
+export interface ManagerOption {
+  id: number;
+  name: string;
 }
 
 export interface AuthResponse {
