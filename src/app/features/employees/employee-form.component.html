@@ -1,15 +1,19 @@
 <section class="page">
   <div class="toolbar-row">
     <h2>{{ id ? 'Edit' : 'Add' }} Employee</h2>
-    <button mat-stroked-button type="button" routerLink="/employees">Cancel</button>
+    <button mat-stroked-button type="button" routerLink="/employees">
+      Cancel
+    </button>
   </div>
   <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
-
     @for (field of textFields; track field.name) {
-      <mat-form-field appearance="outline">
-        <mat-label>{{ field.label }}</mat-label>
-        <input matInput [type]="field.type" [formControlName]="field.name" />
-      </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ field.label }}</mat-label>
+      <input matInput [type]="field.type" [formControlName]="field.name" />
+      @if (isInvalid(field.name)) {
+      <mat-error>{{ getErrorMessage(field.name) }}</mat-error>
+      }
+    </mat-form-field>
     }
 
     <mat-form-field appearance="outline">
@@ -19,27 +23,35 @@
         <mat-option value="FEMALE">Female</mat-option>
         <mat-option value="OTHER">Other</mat-option>
       </mat-select>
+      @if (isInvalid('gender')) {
+      <mat-error>{{ getErrorMessage('gender') }}</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Department</mat-label>
       <mat-select formControlName="departmentId">
         @for (dept of departmentList; track dept.id) {
-          <mat-option [value]="dept.id">{{ dept.name }}</mat-option>
+        <mat-option [value]="dept.id">{{ dept.name }}</mat-option>
         }
       </mat-select>
+      @if (isInvalid('departmentId')) {
+      <mat-error>{{ getErrorMessage('departmentId') }}</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Designation</mat-label>
       <mat-select formControlName="designationId">
         @if (!form.value.departmentId) {
-          <mat-option disabled>Select a department first</mat-option>
-        }
-        @for (desig of designationList; track desig.id) {
-          <mat-option [value]="desig.id">{{ desig.name }}</mat-option>
+        <mat-option disabled>Select a department first</mat-option>
+        } @for (desig of designationList; track desig.id) {
+        <mat-option [value]="desig.id">{{ desig.name }}</mat-option>
         }
       </mat-select>
+      @if (isInvalid('designationId')) {
+      <mat-error>{{ getErrorMessage('designationId') }}</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -50,6 +62,9 @@
         <mat-option value="MANAGER">Manager</mat-option>
         <mat-option value="EMPLOYEE">Employee</mat-option>
       </mat-select>
+      @if (isInvalid('role')) {
+      <mat-error>{{ getErrorMessage('role') }}</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -59,11 +74,20 @@
         <mat-option value="INACTIVE">Inactive</mat-option>
         <mat-option value="TERMINATED">Terminated</mat-option>
       </mat-select>
+      @if (isInvalid('status')) {
+      <mat-error>{{ getErrorMessage('status') }}</mat-error>
+      }
     </mat-form-field>
 
     <div class="form-actions">
-      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid"
+      >
+        Save
+      </button>
     </div>
-
   </form>
 </section>

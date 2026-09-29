@@ -7,6 +7,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { RouterLink } from "@angular/router";
 import { EmployeeService } from "src/app/services/employee.service";
 import { LeaveService } from "src/app/services/leave.service";
+import { SnackbarService } from "src/app/services/snackbar.service";
 
 @Component({
   standalone: true,
@@ -24,19 +25,41 @@ export class ProfileComponent implements OnInit {
     private employees: EmployeeService,
     private auth: AuthService,
     private leaveService: LeaveService,
+    private snackBar: SnackbarService,
   ) {}
 
   ngOnInit(): void {
-    this.employees.me().subscribe((e) => (this.profile = e));
-    this.leaveService.history().subscribe((page) => {
-      const leaves = page.content;
-      this.leaveStats = {
-        total: leaves.length,
-        approved: leaves.filter((l: any) => l.status === "APPROVED").length,
-        pending: leaves.filter((l: any) => l.status === "PENDING").length,
-        rejected: leaves.filter((l: any) => l.status === "REJECTED").length,
-        cancelled: leaves.filter((l: any) => l.status === "CANCELLED").length,
-      };
+    this.employees.me().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.profile = res;
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to load profile",
+        );
+      },
+    });
+    this.leaveService.history().subscribe({
+      next: (page: any) => {
+        if (page) {
+          const leaves = page.content;
+          this.leaveStats = {
+            total: leaves.length,
+            approved: leaves.filter((l: any) => l.status === "APPROVED").length,
+            pending: leaves.filter((l: any) => l.status === "PENDING").length,
+            rejected: leaves.filter((l: any) => l.status === "REJECTED").length,
+            cancelled: leaves.filter((l: any) => l.status === "CANCELLED")
+              .length,
+          };
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to load leave history",
+        );
+      },
     });
   }
 }

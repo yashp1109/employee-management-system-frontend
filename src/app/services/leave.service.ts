@@ -14,7 +14,7 @@ export class LeaveService {
     return this.http.get<Page<LeaveRequest>>(`${API_URL}/history`);
   }
   balance() {
-    return this.http.get<LeaveBalance[]>(`${API_URL}/balance`);
+    return this.http.get<LeaveBalance[]>(`${API_URL}/balances`);
   }
   pending() {
     return this.http.get<Page<LeaveRequest>>(`${API_URL}/pending-approvals`);

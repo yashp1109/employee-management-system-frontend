@@ -2,9 +2,11 @@ import { Routes } from "@angular/router";
 import { authGuard, roleGuard } from "./core/guards/auth.guard";
 import { AppShellComponent } from "./layout/app-shell.component";
 import { LoginComponent } from "./features/login/login.component";
+import { ForgotpasswordComponent } from "./features/forgotpassword/forgotpassword.component";
 
 export const routes: Routes = [
   { path: "login", component: LoginComponent },
+  { path: "forgotpassword", component: ForgotpasswordComponent },
   {
     path: "",
     component: AppShellComponent,

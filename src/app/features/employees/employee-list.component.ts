@@ -1,18 +1,15 @@
+import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from "@angular/forms";
-import { Employee, ManagerOption } from "../../core/models/models";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Employee, ManagerOption, Role } from "../../core/models/models";
 import { Department } from "../../core/models/models";
 import { EmployeeService } from "src/app/services/employee.service";
 import { DepartmentService } from "src/app/services/department.service";
 import { AuthService } from "../../core/auth/auth.service";
 import { SnackbarService } from "src/app/services/snackbar.service";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 5;
 
 @Component({
   standalone: true,
@@ -25,7 +22,9 @@ export class EmployeeListComponent implements OnInit {
   total = 0;
   totalPages = 1;
   pageIndex = 0;
-
+  sortAsc: any;
+  sortDirection: "asc" | "desc" = "asc";
+  sortField: string = "firstName";
   departmentList: Department[] = [];
   managerList: ManagerOption[] = [];
 
@@ -45,13 +44,32 @@ export class EmployeeListComponent implements OnInit {
   private editingSource: Employee | null = null;
 
   form = this.fb.group({
-    fullName: ["", Validators.required],
-    employeeCode: ["", Validators.required],
+    fullName: [
+      "",
+      [Validators.required, Validators.minLength(3), Validators.maxLength(100)],
+    ],
+
+    employeeCode: [
+      "",
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(20),
+        Validators.pattern(/^[A-Za-z0-9]+$/),
+      ],
+    ],
+
     departmentId: [null as number | null, Validators.required],
+
     managerId: [null as number | null],
+
     dateOfJoining: ["", Validators.required],
+
     email: ["", [Validators.required, Validators.email]],
-    mobileNumber: [""],
+
+    mobileNumber: ["", [Validators.pattern(/^[6-9]\d{9}$/)]],
+
+    role: ["", Validators.required],
   });
 
   // delete confirmation
@@ -67,10 +85,35 @@ export class EmployeeListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.departments.list().subscribe((list) => (this.departmentList = list));
+    this.loadDepartments();
     this.loadManagers();
     this.load();
-    this.filters.valueChanges.subscribe(() => {
+
+    // Search field with debounce
+    this.filters.controls.q.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        this.pageIndex = 0;
+        this.load();
+      });
+
+    // Other filters load immediately
+    this.filters.controls.departmentId.valueChanges.subscribe(() => {
+      this.pageIndex = 0;
+      this.load();
+    });
+
+    this.filters.controls.managerId.valueChanges.subscribe(() => {
+      this.pageIndex = 0;
+      this.load();
+    });
+
+    this.filters.controls.joiningFrom.valueChanges.subscribe(() => {
+      this.pageIndex = 0;
+      this.load();
+    });
+
+    this.filters.controls.joiningTo.valueChanges.subscribe(() => {
       this.pageIndex = 0;
       this.load();
     });
@@ -78,6 +121,14 @@ export class EmployeeListComponent implements OnInit {
 
   private loadManagers(): void {
     this.employees.managers().subscribe((list) => (this.managerList = list));
+  }
+
+  private loadDepartments(): void {
+    this.departments.list().subscribe({
+      next: (departments) => {
+        this.departmentList = departments;
+      },
+    });
   }
 
   load(): void {
@@ -91,6 +142,7 @@ export class EmployeeListComponent implements OnInit {
         joiningTo: f.joiningTo || null,
         page: this.pageIndex,
         size: PAGE_SIZE,
+        sort: `${this.sortField},${this.sortDirection}`,
       })
       .subscribe((page) => {
         this.rows = page.content;
@@ -135,6 +187,7 @@ export class EmployeeListComponent implements OnInit {
       dateOfJoining: "",
       email: "",
       mobileNumber: "",
+      role: "",
     });
     this.panelOpen = true;
   }
@@ -142,6 +195,9 @@ export class EmployeeListComponent implements OnInit {
   openEdit(emp: Employee): void {
     this.editingId = emp.id ?? null;
     this.editingSource = emp;
+    this.form.get("employeeCode")?.disable();
+    this.form.get("dateOfJoining")?.disable();
+
     this.form.reset({
       fullName: `${emp.firstName} ${emp.lastName}`.trim(),
       employeeCode: emp.employeeCode,
@@ -150,6 +206,7 @@ export class EmployeeListComponent implements OnInit {
       dateOfJoining: emp.dateOfJoining ?? "",
       email: emp.email,
       mobileNumber: emp.mobileNumber ?? "",
+      role: emp.role ?? "",
     });
     this.panelOpen = true;
   }
@@ -185,7 +242,7 @@ export class EmployeeListComponent implements OnInit {
       salary: src?.salary ?? 0,
       managerId: v.managerId ?? undefined,
       status: src?.status ?? "ACTIVE",
-      role: src?.role ?? "EMPLOYEE",
+      role: (v.role as Role) ?? "EMPLOYEE",
     };
 
     this.saving = true;
@@ -239,5 +296,11 @@ export class EmployeeListComponent implements OnInit {
         );
       },
     });
+  }
+
+  sortByName(): void {
+    this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+    this.sortField = "firstName";
+    this.load();
   }
 }

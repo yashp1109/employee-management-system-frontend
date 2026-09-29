@@ -55,6 +55,9 @@
               type="email"
               autocomplete="email"
             />
+            @if (isInvalid('email')) {
+            <mat-error>{{ getErrorMessage('email') }}</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -63,9 +66,24 @@
             <input
               matInput
               formControlName="password"
-              type="password"
+              [type]="hidePassword ? 'password' : 'text'"
               autocomplete="current-password"
+              [attr.aria-label]="'Toggle password visibility'"
             />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="hidePassword = !hidePassword"
+              [attr.aria-label]="'Toggle password visibility'"
+            >
+              <mat-icon>
+                {{ hidePassword ? 'visibility' : 'visibility_off' }}
+              </mat-icon>
+            </button>
+            @if (isInvalid('password')) {
+            <mat-error>{{ getErrorMessage('password') }}</mat-error>
+            }
           </mat-form-field>
 
           @if (error) {
@@ -79,8 +97,10 @@
             [disabled]="form.invalid"
             class="login-btn"
           >
-            Sign in securely
+            Sign in
           </button>
+
+          <!-- <a href="/forgotpassword">Forgot Password?</a> -->
 
           <p class="hint">Demo: admin&#64;ems.local / Password&#64;123</p>
         </form>

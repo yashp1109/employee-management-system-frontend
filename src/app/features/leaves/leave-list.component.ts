@@ -6,6 +6,7 @@ import { MatTableModule } from "@angular/material/table";
 import { MatTabsModule } from "@angular/material/tabs";
 import { LeaveBalance, LeaveRequest } from "../../core/models/models";
 import { LeaveService } from "src/app/services/leave.service";
+import { SnackbarService } from "src/app/services/snackbar.service";
 
 @Component({
   standalone: true,
@@ -24,18 +25,64 @@ export class LeaveListComponent implements OnInit {
   rows: LeaveRequest[] = [];
   balances: LeaveBalance[] = [];
 
-  constructor(private leaves: LeaveService) {}
+  constructor(
+    private leaves: LeaveService,
+    private snackBar: SnackbarService,
+  ) {}
 
   ngOnInit(): void {
-    this.leaves.history().subscribe((page: any) => (this.rows = page.content));
-    this.leaves.balance().subscribe((b: any) => (this.balances = b));
+    this.leaves.history().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.rows = res.content;
+        }
+      },
+      error: (err: any) => {
+        console.error(err?.error?.message || "Failed to load leave history");
+      },
+    });
+    this.leaves.balance().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.balances = res;
+          console.debug("leave balance: ", res);
+        }
+      },
+      error: (err: any) => {
+        console.error(err?.error?.message || "Failed to load leave balance");
+      },
+    });
   }
 
   cancel(id: number): void {
-    this.leaves
-      .cancel(id)
-      .subscribe(() =>
-        this.leaves.history().subscribe((page) => (this.rows = page.content)),
-      );
+    this.leaves.cancel(id).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.snackBar.successSnackBar(
+            res?.message || "Leave cancelled successfully",
+          );
+          this.leaves.history().subscribe({
+            next: (page: any) => {
+              if (page) {
+                this.rows = page.content;
+              }
+            },
+            error: (err: any) => {
+              console.error(
+                err?.error?.message || "Failed to refresh leave history",
+              );
+              this.snackBar.errorSnackBar(
+                err?.error?.message || "Failed to refresh leave history",
+              );
+            },
+          });
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to cancel leave",
+        );
+      },
+    });
   }
 }

@@ -12,6 +12,7 @@ export interface EmployeeFilters {
   joiningTo?: string | null;
   page?: number;
   size?: number;
+  sort?: string;
 }
 
 @Injectable({ providedIn: "root" })
@@ -21,13 +22,15 @@ export class EmployeeService {
     let params = new HttpParams()
       .set("page", filters.page ?? 0)
       .set("size", filters.size ?? 10)
-      .set("sort", "employeeCode,asc");
+      .set("sort", "employeeCode,asc")
+      .set("sort", filters.sort ?? "firstName,asc");
     if (filters.q) params = params.set("q", filters.q);
     if (filters.departmentId != null)
       params = params.set("departmentId", filters.departmentId);
     if (filters.managerId != null)
       params = params.set("managerId", filters.managerId);
-    if (filters.joiningFrom) params = params.set("joiningFrom", filters.joiningFrom);
+    if (filters.joiningFrom)
+      params = params.set("joiningFrom", filters.joiningFrom);
     if (filters.joiningTo) params = params.set("joiningTo", filters.joiningTo);
     return this.http.get<Page<Employee>>(API_URL, { params });
   }

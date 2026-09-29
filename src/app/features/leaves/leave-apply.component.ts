@@ -1,13 +1,21 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatIconModule } from "@angular/material/icon";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatNativeDateModule } from "@angular/material/core";
 import { LeaveBalance } from "../../core/models/models";
 import { LeaveService } from "src/app/services/leave.service";
+import { SnackbarService } from "src/app/services/snackbar.service";
 
 const FALLBACK_TYPES: LeaveBalance[] = [
   {
@@ -43,6 +51,8 @@ const FALLBACK_TYPES: LeaveBalance[] = [
     MatSelectModule,
     MatIconModule,
     RouterLink,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   templateUrl: "./leave-apply.component.html",
   styleUrl: "./leave-apply.component.css",
@@ -63,6 +73,7 @@ export class LeaveApplyComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private leaves: LeaveService,
+    private snackBar: SnackbarService,
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +92,30 @@ export class LeaveApplyComponent implements OnInit {
     this.form
       .get("leaveTypeId")!
       .valueChanges.subscribe(() => this.syncSelected());
+  }
+
+  getControl(name: string): AbstractControl | null {
+    return this.form.get(name);
+  }
+
+  isInvalid(name: string): boolean {
+    const control = this.getControl(name);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  getErrorMessage(name: string): string {
+    const control = this.getControl(name);
+    if (!control || !control.errors) return "";
+    if (control.hasError("required")) {
+      return "This field is required.";
+    }
+    return "Please correct this field.";
+  }
+
+  isDateRangeInvalid(): boolean {
+    const startDate = this.form.get("startDate")?.value;
+    const endDate = this.form.get("endDate")?.value;
+    return !!startDate && !!endDate && endDate < startDate;
   }
 
   private syncSelected(): void {
@@ -105,9 +140,25 @@ export class LeaveApplyComponent implements OnInit {
   }
 
   save(): void {
-    if (this.form.invalid) return;
-    this.leaves
-      .apply(this.form.getRawValue() as any)
-      .subscribe(() => this.router.navigateByUrl("/leaves"));
+    if (this.form.invalid || this.isDateRangeInvalid()) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.leaves.apply(this.form.getRawValue() as any).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.snackBar.successSnackBar(
+            res?.message || "Leave application submitted successfully",
+          );
+          this.router.navigateByUrl("/leaves");
+        }
+      },
+      error: (err: any) => {
+        console.error(err?.error?.message || "Failed to apply for leave");
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to apply for leave",
+        );
+      },
+    });
   }
 }

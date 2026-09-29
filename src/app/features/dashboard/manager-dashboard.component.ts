@@ -12,7 +12,19 @@ import { DashboardService } from "../../services/dashboard.service";
 export class ManagerDashboardComponent implements OnInit {
   data: any;
   constructor(private dashboard: DashboardService) {}
+
   ngOnInit(): void {
-    this.dashboard.manager().subscribe((data) => (this.data = data));
+    this.dashboard.manager().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.data = res;
+        }
+      },
+      error: (err: any) => {
+        console.error(
+          err?.error?.message || "Failed to load manager dashboard",
+        );
+      },
+    });
   }
 }

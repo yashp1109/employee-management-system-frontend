@@ -5,32 +5,35 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { Router, RouterLink } from "@angular/router";
+import { RouterLink } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
-import { DepartmentService } from "../../services/department.service";
 import { SnackbarService } from "src/app/services/snackbar.service";
 
 @Component({
+  selector: "forgotpassword",
   standalone: true,
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     RouterLink,
   ],
-  templateUrl: "./department-add.component.html",
-  styleUrl: "./department-add.component.css",
+  templateUrl: "./forgotpassword.component.html",
+  styleUrl: "./forgotpassword.component.css",
 })
-export class DepartmentAddComponent {
-  form = this.fb.group({ name: ["", Validators.required], description: [""] });
+export class ForgotpasswordComponent {
+  submitted = false;
+  form = this.fb.group({
+    email: ["", [Validators.required, Validators.email]],
+  });
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
-    private departments: DepartmentService,
     private snackBar: SnackbarService,
   ) {}
 
@@ -49,29 +52,22 @@ export class DepartmentAddComponent {
     if (control.hasError("required")) {
       return "This field is required.";
     }
+    if (control.hasError("email")) {
+      return "Please enter a valid email address.";
+    }
     return "Please correct this field.";
   }
 
-  save(): void {
+  submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.departments.create(this.form.getRawValue() as any).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.snackBar.successSnackBar(
-            res?.message || "Department created successfully",
-          );
-          this.router.navigateByUrl("/departments");
-        }
-      },
-      error: (err: any) => {
-        this.snackBar.errorSnackBar(
-          err?.error?.message || "Failed to create department",
-        );
-      },
-    });
+    const email = this.form.value.email;
+    this.submitted = true;
+    this.snackBar.successSnackBar(
+      `If ${email} is registered, a reset link has been sent.`,
+    );
   }
 }

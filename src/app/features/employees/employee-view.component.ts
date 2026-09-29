@@ -39,7 +39,18 @@ export class EmployeeViewComponent implements OnInit {
   ngOnInit(): void {
     this.employees
       .get(Number(this.route.snapshot.paramMap.get("id")))
-      .subscribe((e) => (this.employee = e));
+      .subscribe({
+        next: (res: any) => {
+          if (res) {
+            this.employee = res;
+          }
+        },
+        error: (err: any) => {
+          console.error(
+            err?.error?.message || "Failed to load employee details",
+          );
+        },
+      });
   }
 
   requestProfileUpdate(): void {

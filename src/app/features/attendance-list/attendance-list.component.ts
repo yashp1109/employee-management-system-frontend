@@ -7,6 +7,7 @@ import { Attendance, Employee } from "../../core/models/models";
 import { AttendanceService } from "../../services/attendance.service";
 import { EmployeeService } from "../../services/employee.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { SnackbarService } from "src/app/services/snackbar.service";
 const WORK_DAY_MINUTES = 9 * 60;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 32;
 const SHOW_DAYS = 14; // how many past days to show including today
@@ -41,7 +42,7 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
   constructor(
     private attendance: AttendanceService,
     private employees: EmployeeService,
-    private snackBar: MatSnackBar,
+    private snackBar: SnackbarService,
   ) {}
   ngOnInit(): void {
     this.loadJoinDate();
@@ -60,32 +61,62 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
   private joinDate?: string;
 
   loadJoinDate(): void {
+    const nextAction = (employee: any) => {
+      this.joinDate = employee.dateOfJoining;
+      this.load();
+    };
+
     if (this.employeeId != null) {
-      this.employees.get(this.employeeId).subscribe((employee) => {
-        this.joinDate = employee.dateOfJoining;
-        this.load();
+      this.employees.get(this.employeeId).subscribe({
+        next: (res: any) => {
+          if (res) {
+            nextAction(res);
+          }
+        },
+        error: (err: any) => {
+          this.snackBar.errorSnackBar(
+            err?.error?.message || "Failed to load employee join date",
+          );
+        },
       });
     } else {
-      this.employees.me().subscribe((employee) => {
-        this.joinDate = employee.dateOfJoining;
-        this.load();
+      this.employees.me().subscribe({
+        next: (res: any) => {
+          if (res) {
+            nextAction(res);
+          }
+        },
+        error: (err: any) => {
+          this.snackBar.errorSnackBar(
+            err?.error?.message || "Failed to load employee join date",
+          );
+        },
       });
     }
   }
 
   load(): void {
-    this.attendance.history(this.employeeId).subscribe((page) => {
-      this._raw = page.content;
-      console.debug(
-        "attendance.load: fetched",
-        this._raw.map((a) => ({
-          date: a.date,
-          checkIn: a.checkInTime,
-          checkOut: a.checkOutTime,
-        })),
-      );
-      this.buildRows(this._raw);
-      this.updateDisplayRows();
+    this.attendance.history(this.employeeId).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this._raw = res.content;
+          console.debug(
+            "attendance.load: fetched",
+            this._raw.map((a) => ({
+              date: a.date,
+              checkIn: a.checkInTime,
+              checkOut: a.checkOutTime,
+            })),
+          );
+          this.buildRows(this._raw);
+          this.updateDisplayRows();
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to load attendance history",
+        );
+      },
     });
   }
 
@@ -97,12 +128,7 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
     );
     const result: AttendanceRow[] = [];
 
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-    startDate.setDate(startDate.getDate() - SHOW_DAYS + 1);
-    const effectiveStart = joinStartDate
-      ? new Date(Math.max(startDate.getTime(), joinStartDate.getTime()))
-      : startDate;
+    const effectiveStart = joinStartDate ?? new Date();
 
     for (let d = new Date(); d >= effectiveStart; d.setDate(d.getDate() - 1)) {
       const dateKey = this.dateStr(d);
@@ -159,11 +185,12 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
 
   checkIn(): void {
     this.attendance.checkIn().subscribe({
-      next: (resp) => {
-        console.debug("attendance.checkIn: resp", resp);
-        this.snackBar.open(resp.message, "Close", {
-          duration: 3000,
-        });
+      next: (resp: any) => {
+        if (resp) {
+          this.snackBar.successSnackBar(
+            resp?.message || "Checked in successfully",
+          );
+        }
         // optimistic update: merge returned attendance into local cache
         try {
           const key = this.normalizeDateString(resp.date);
@@ -176,22 +203,30 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
           this.pageIndex = 0;
           this.buildRows(this._raw);
           this.updateDisplayRows();
+          this.load();
         } catch (e) {
           // fallback to full reload if anything goes wrong
           this.pageIndex = 0;
           this.load();
         }
       },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to check in",
+        );
+      },
     });
   }
 
   checkOut(): void {
     this.attendance.checkOut().subscribe({
-      next: (resp) => {
+      next: (resp: any) => {
+        if (resp) {
+          this.snackBar.successSnackBar(
+            resp?.message || "Checked out successfully",
+          );
+        }
         console.debug("attendance.checkOut: resp", resp);
-        this.snackBar.open(resp.message, "Close", {
-          duration: 3000,
-        });
         // optimistic update: merge returned attendance into local cache
         try {
           const key = this.normalizeDateString(resp.date);
@@ -209,6 +244,11 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
           this.pageIndex = 0;
           this.load();
         }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to check out",
+        );
       },
     });
   }

@@ -12,7 +12,17 @@ import { DashboardService } from "../../services/dashboard.service";
 export class AdminDashboardComponent implements OnInit {
   data: any;
   constructor(private dashboard: DashboardService) {}
+
   ngOnInit(): void {
-    this.dashboard.admin().subscribe((data) => (this.data = data));
+    this.dashboard.admin().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.data = res;
+        }
+      },
+      error: (err: any) => {
+        console.error(err?.error?.message || "Failed to load admin dashboard");
+      },
+    });
   }
 }

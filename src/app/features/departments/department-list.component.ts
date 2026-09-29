@@ -16,7 +16,17 @@ export class DepartmentListComponent implements OnInit {
   columns = ["name", "description"];
   rows: Department[] = [];
   constructor(private departments: DepartmentService) {}
+
   ngOnInit(): void {
-    this.departments.list().subscribe((rows) => (this.rows = rows));
+    this.departments.list().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.rows = res;
+        }
+      },
+      error: (err: any) => {
+        console.error(err?.error?.message || "Failed to load departments");
+      },
+    });
   }
 }

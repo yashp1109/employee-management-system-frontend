@@ -1,5 +1,10 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -8,6 +13,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { DepartmentService } from "../../services/department.service";
 import { Department, Designation } from "src/app/core/models/models";
 import { EmployeeService } from "src/app/services/employee.service";
+import { SnackbarService } from "src/app/services/snackbar.service";
 
 @Component({
   standalone: true,
@@ -45,16 +51,19 @@ export class EmployeeFormComponent implements OnInit {
     firstName: ["", Validators.required],
     lastName: ["", Validators.required],
     email: ["", [Validators.required, Validators.email]],
-    mobileNumber: [""],
+    mobileNumber: [
+      "",
+      [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)],
+    ],
     gender: ["OTHER", Validators.required],
     dateOfBirth: [""],
     dateOfJoining: ["", Validators.required],
     departmentId: [null as number | null, Validators.required],
     designationId: [null as number | null, Validators.required],
-    salary: [null as number | null, Validators.required],
+    salary: [null as number | null, [Validators.required, Validators.min(0)]],
     managerId: [null as number | null],
     status: ["ACTIVE", Validators.required],
-    role: ["EMPLOYEE", Validators.required],
+    role: ["", Validators.required],
     password: [""],
   });
 
@@ -64,18 +73,37 @@ export class EmployeeFormComponent implements OnInit {
     private router: Router,
     private employees: EmployeeService,
     private departments: DepartmentService,
+    private snackBar: SnackbarService,
   ) {}
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get("id")) || undefined;
-    this.departments.list().subscribe((list) => {
-      this.departmentList = list;
-      if (this.id) {
-        this.employees.get(this.id).subscribe((emp) => {
-          this.form.patchValue(emp as any);
-          this.loadDesignations(emp.departmentId);
-        });
-      }
+    this.departments.list().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.departmentList = res;
+          if (this.id) {
+            this.employees.get(this.id).subscribe({
+              next: (emp: any) => {
+                if (emp) {
+                  this.form.patchValue(emp as any);
+                  this.loadDesignations(emp.departmentId);
+                }
+              },
+              error: (err: any) => {
+                this.snackBar.errorSnackBar(
+                  err?.error?.message || "Failed to load employee details",
+                );
+              },
+            });
+          }
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to load departments",
+        );
+      },
     });
 
     // reload designations whenever departmentId changes
@@ -87,18 +115,95 @@ export class EmployeeFormComponent implements OnInit {
     });
   }
 
+  getControl(name: string): AbstractControl | null {
+    return this.form.get(name);
+  }
+
+  isInvalid(name: string): boolean {
+    const control = this.getControl(name);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  getErrorMessage(name: string): string {
+    const control = this.getControl(name);
+    if (!control || !control.errors) return "";
+    if (control.hasError("required")) {
+      return "This field is required.";
+    }
+    if (control.hasError("email")) {
+      return "Please enter a valid email address.";
+    }
+    if (control.hasError("min")) {
+      return "Value must be zero or greater.";
+    }
+    if (control.hasError("pattern")) {
+      return "Please enter a valid value.";
+    }
+    return "Please correct this field.";
+  }
+
   loadDesignations(departmentId: number): void {
-    this.departments
-      .designations(departmentId)
-      .subscribe((list) => (this.designationList = list));
+    this.departments.designations(departmentId).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.designationList = res;
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to load designations",
+        );
+      },
+    });
+  }
+
+  updateEmployyee(id: any, payload: any): void {
+    if (this.form.invalid || !this.id) return;
+    this.employees.update(id, payload).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.snackBar.successSnackBar(
+            res?.message || "Employee updated successfully",
+          );
+          this.router.navigateByUrl("/employees");
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to update employee",
+        );
+      },
+    });
+  }
+
+  createEmployee(payload: any): void {
+    this.employees.create(payload).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.snackBar.successSnackBar(
+            res?.message || "Employee created successfully",
+          );
+          this.router.navigateByUrl("/employees");
+        }
+      },
+      error: (err: any) => {
+        this.snackBar.errorSnackBar(
+          err?.error?.message || "Failed to create employee",
+        );
+      },
+    });
   }
 
   save(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     const payload = this.form.getRawValue() as any;
-    const request = this.id
-      ? this.employees.update(this.id, payload)
-      : this.employees.create(payload);
-    request.subscribe(() => this.router.navigateByUrl("/employees"));
+    if (this.id) {
+      this.updateEmployyee(this.id, payload);
+    } else {
+      this.createEmployee(payload);
+    }
   }
 }
